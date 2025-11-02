@@ -1,0 +1,221 @@
+# Diagrama de Clases - HomeSolution (Mermaid)
+
+```mermaid
+classDiagram
+    %% Interfaz Principal
+    class IHomeSolution {
+        <<interface>>
+        +registrarEmpleado(String nombre, double valor)
+        +registrarEmpleado(String nombre, double valor, String categoria)
+        +registrarProyecto(String[] titulos, String[] descripcion, double[] dias, String domicilio, String[] cliente, String inicio, String fin)
+        +asignarResponsableEnTarea(Integer numero, String titulo)
+        +asignarResponsableMenosRetraso(Integer numero, String titulo)
+        +registrarRetrasoEnTarea(Integer numero, String titulo, double cantidadDias)
+        +agregarTareaEnProyecto(Integer numero, String titulo, String descripcion, double dias)
+        +finalizarTarea(Integer numero, String titulo)
+        +finalizarProyecto(Integer numero, String fin)
+        +reasignarEmpleadoEnProyecto(Integer numero, Integer legajo, String titulo)
+        +reasignarEmpleadoConMenosRetraso(Integer numero, String titulo)
+        +costoProyecto(Integer numero) double
+        +proyectosFinalizados() List~Tupla~
+        +proyectosPendientes() List~Tupla~
+        +proyectosActivos() List~Tupla~
+        +empleadosNoAsignados() Object[]
+        +estaFinalizado(Integer numero) boolean
+        +consultarCantidadRetrasosEmpleado(Integer legajo) int
+        +empleadosAsignadosAProyecto(Integer numero) List~Tupla~
+        +tareasProyectoNoAsignadas(Integer numero) Object[]
+        +tareasDeUnProyecto(Integer numero) Object[]
+        +consultarDomicilioProyecto(Integer numero) String
+        +tieneRestrasos(Integer legajo) boolean
+        +empleados() List~Tupla~
+        +consultarProyecto(Integer numero) String
+    }
+
+    %% Clase Principal
+    class HomeSolution {
+        -Map~Integer, Proyecto~ proyectos
+        -Set~String~ clientes
+        -Map~Integer, Empleado~ empleados
+        -int nextNum
+        -int nextLeg
+        +HomeSolution()
+        +crearProyecto(Integer numeroDeIdentificacion, String direccion) boolean
+        +agregarClienteDelProyecto(String nombre, Integer numTelefono, String email, Integer numProyecto)
+    }
+
+    %% Cliente
+    class Cliente {
+        -String nombre
+        -Integer numTelefono
+        -String email
+        +Cliente(String nom, Integer numTel, String emailContacto)
+        +toString() String
+        +equals(Object obj) boolean
+        +hashCode() int
+    }
+
+    %% Empleado (Abstracta)
+    class Empleado {
+        <<abstract>>
+        -String nombre
+        -Integer numLegajo
+        -Integer cantidadRetrasos
+        -boolean asignado
+        +Empleado(String nom, Integer legajo)
+        +asignar()
+        +desAsignar()
+        +estaAsignado() boolean
+        +incrementarRetrasos()
+        +darCantidadDeRetrasos() Integer
+        +darLegajo() Integer
+        +darNombre() String
+        +calcularPago(double diasTrabajados)* double
+        +calcularAdicionalPorNoRetraso(double pagoBase)* double
+    }
+
+    %% EmpleadoContratado
+    class EmpleadoContratado {
+        -double valorHora
+        +EmpleadoContratado(String nom, Integer legajo, double pagaPorHora)
+        +calcularPago(double diasTrabajados) double
+        +calcularAdicionalPorNoRetraso(double pagoBase) double
+    }
+
+    %% EmpleadoDePlanta
+    class EmpleadoDePlanta {
+        -double valorDia
+        -String categoria
+        +EmpleadoDePlanta(String nom, Integer legajo, double pagaPorDia, String CATEGORIA)
+        +calcularPago(double diasTrabajados) double
+        +calcularAdicionalPorNoRetraso(double pagoBase) double
+    }
+
+    %% Proyecto
+    class Proyecto {
+        -Integer numDeIdentificacion
+        -Cliente clienteQueContrato
+        -String direccion
+        -Map~String, Tarea~ tareas
+        -Set~Integer~ empleados
+        -LocalDate fechaDeInicio
+        -LocalDate fechaEstimada
+        -LocalDate fechaDeFinalizacion
+        -double costoProyecto
+        -String estado
+        +Proyecto(Integer identificacion, String direc)
+        +agregarCliente(Cliente cliente)
+        +agregarTarea(String titulo, String descripcion, double dias) boolean
+        +asignarEmpleadoATarea(String tituloTarea, Empleado empleado) boolean
+        +reAsignarEmpleado(String tituloTarea, Empleado empleado) boolean
+        +iniciarProyecto(LocalDate fechaInicio)
+        +marcarFinalizado()
+        +estaFinalizado() boolean
+        +darCosto() double
+        +estimarFechaDeFinalizacion()
+        +cambiarFechaEstimada(LocalDate nuevaFecha)
+        +darFechaDeInicio() LocalDate
+        +cambiarFechaDeFinalizacion(LocalDate fechaFin)
+        +tieneTarea(String titulo) boolean
+        +darTarea(String titulo) Tarea
+        +darNumeroDeIdentificacion() Integer
+        +darDireccion() String
+        +darLegajos() Set~Integer~
+        +darTareas() Collection~Tarea~
+        +estaPendiente() boolean
+        +toString() String
+        +equals(Object obj) boolean
+        +hashCode() int
+    }
+
+    %% Tarea
+    class Tarea {
+        -String titulo
+        -String descripcion
+        -double diasNecesarios
+        -double diasDeRetraso
+        -ArrayList~Empleado~ empleadosResponsables
+        -double costoTarea
+        -boolean terminada
+        +Tarea(String titu, String descrip, double diasNeces)
+        +asignarEmpleado(Empleado empleado) boolean
+        +registrarRetraso(double diasRetrasados)
+        +huboRetraso() boolean
+        +calcularCosto()
+        +obtenerCosto() double
+        +marcarTerminada()
+        +estaTerminada() boolean
+        +darDiasNecesarios() double
+        +darEmpleados() ArrayList~Empleado~
+        +liberarEmpleados()
+        +toString() String
+        +equals(Object obj) boolean
+        +hashCode() int
+    }
+
+    %% Estado
+    class Estado {
+        <<utility>>
+        +String activo$ = "ACTIVO"
+        +String pendiente$ = "PENDIENTE"
+        +String finalizado$ = "FINALIZADO"
+    }
+
+    %% Tupla
+    class Tupla~T1, T2~ {
+        -T1 valor1
+        -T2 valor2
+        +Tupla(T1 valor1, T2 valor2)
+        +getValor1() T1
+        +setValor1(T1 valor1)
+        +getValor2() T2
+        +setValor2(T2 valor2)
+    }
+
+    %% Relaciones
+    IHomeSolution <|.. HomeSolution : implements
+    
+    HomeSolution "1" *-- "0..*" Proyecto : gestiona
+    HomeSolution "1" *-- "0..*" Empleado : gestiona
+    HomeSolution "1" o-- "0..*" Cliente : registra
+    
+    Proyecto "1" *-- "1..*" Tarea : contiene
+    Proyecto "1" o-- "1" Cliente : tiene
+    
+    Tarea "1" o-- "0..*" Empleado : asignado a
+    
+    Empleado <|-- EmpleadoContratado : extends
+    Empleado <|-- EmpleadoDePlanta : extends
+    
+    Proyecto ..> Estado : usa
+    
+    HomeSolution ..> Tupla : retorna
+    IHomeSolution ..> Tupla : retorna
+
+    %% Notas
+    note for Estado "Clase de constantes\npara estados de proyecto"
+    note for Tupla "Clase genérica para\nretornar pares de valores"
+    note for Empleado "Clase abstracta que define\nel comportamiento común"
+```
+
+## Leyenda de Relaciones
+
+- **`<|--`**: Herencia (extends)
+- **`<|..`**: Implementación (implements)
+- **`*--`**: Composición (el contenedor es dueño)
+- **`o--`**: Agregación (asociación débil)
+- **`..>`**: Dependencia (usa)
+
+## Multiplicidades
+
+- **`1`**: Exactamente uno
+- **`0..*`**: Cero o muchos
+- **`1..*`**: Uno o muchos
+
+## Visualización
+
+Este diagrama se puede visualizar en:
+- GitHub (renderiza automáticamente archivos .md con bloques mermaid)
+- https://mermaid.live/
+- Extensiones de VS Code para Mermaid
+- Cualquier editor compatible con Mermaid
